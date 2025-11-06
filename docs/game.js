@@ -22,7 +22,6 @@ let panorama;
  */
 let svService;
 
-
 /**
  * asks if street view is available at given coords
  * @param {google.maps.LatLng} latLng 
@@ -72,8 +71,7 @@ async function spawnRandomStreetView() {
 }
 
 
-
-function initMap() {
+function initGameMap() {
 
     const uciCenter = { lat: 33.646, lng: -117.841 }; 
     
@@ -142,6 +140,7 @@ function initMap() {
             fullscreenControl: false,
             motionTrackingControl: false,
             linksControl: true,
+            panControl: false,
         }
     );
 
