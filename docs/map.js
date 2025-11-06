@@ -78,8 +78,16 @@ function initMap() {
     const uciCenter = { lat: 33.646, lng: -117.841 }; 
     
     const noLandmarksStyle = [
-        { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-        { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] }
+        {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+        },
+        {
+            featureType: "transit",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+        }
     ];
 
     // create new map object and assign to global 'map' variable
@@ -91,17 +99,13 @@ function initMap() {
         // disable map control
         mapTypeControl: false,
         streetViewControl: false,
-        fullscreenControl: false,
+        fullscreenControl: true,
         zoomControl: true,
         
         // ensure map is visible and properly sized
         disableDefaultUI: false,
         clickableIcons: false,
         gestureHandling: 'greedy',
-        
-        // force size to match CSS
-        width: 300,
-        height: 200
     });
 
     // click listener
