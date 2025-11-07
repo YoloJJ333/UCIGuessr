@@ -131,7 +131,8 @@ function calculateScore() {
     const clicked = marker.getPosition();
     const distance = google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation) / 1000;
 
-    const size = 0.019271984162642; // approx UCI size in km
+    const size = google.maps.geometry.spherical.computeDistanceBetween(
+        new google.maps.LatLng(33.64141191981308, -117.84915619540708), new google.maps.LatLng(33.65480941557804, -117.83530280301413))
     const score = 5000 * Math.exp(-10 * (distance / size));
     return Math.round(score);
 }
