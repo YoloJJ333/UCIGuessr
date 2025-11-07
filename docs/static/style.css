@@ -20,12 +20,20 @@ html, body {
 /* UI Overlay Container*/
 #ui-elements {
     position: fixed;
-    top: 10px;
-    left: 10px;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2000;
     /* allow clicks to pass through the overlay container so Street View underneath can be clicked,
        but enable pointer-events on actual interactive children (buttons/inputs) below */
     pointer-events: none;
+}
+
+#ui-elements h3{
+    background-color: rgba(96, 18, 117, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 10px;
 }
 
 /* Make interactive controls inside the UI clickable while keeping the container click-through */
