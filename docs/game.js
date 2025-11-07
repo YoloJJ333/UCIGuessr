@@ -108,9 +108,6 @@ async function spawnRandomStreetView() {
 
             console.log("Spawned at:", validLocation.toString());
             panorama.setPosition(validLocation);
-            document.getElementById("spawn-coords").textContent =
-                `Spawned at: ${validLocation.lat().toFixed(6)}, ${validLocation.lng().toFixed(6)}`;
-
             startTimer();
             return;
         }
@@ -204,10 +201,6 @@ function initGameMap() {
         
         // get coords from click
         const clickedLatLng = event.latLng;
-        
-        // TO REMOVE
-        const coordsDisplay = document.getElementById("coords-display");
-        coordsDisplay.textContent = `Lat: ${clickedLatLng.lat()}, Lng: ${clickedLatLng.lng()}`;
 
         // place marker
         if (marker === null) {
@@ -240,7 +233,8 @@ function initGameMap() {
         clickToGo: false,           // disables clicking to teleport
         scrollwheel: false,
         disableDefaultUI: true,
-        gestureHandling: 'none'   // disables all gestures
+        gestureHandling: 'none',   // disables all gestures
+        showRoadLabels: false,
     }
     );
 
@@ -275,7 +269,6 @@ function endRound() {
     }
 
     const score = calculateScore();
-    document.getElementById("score-display").textContent = score.toString();
 
     // disable further interactions on map
     map.setOptions({ draggable: false, zoomControl: false, scrollwheel: false, gestureHandling: 'none' });
