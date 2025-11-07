@@ -22,6 +22,39 @@ let panorama;
  */
 let svService;
 
+//**UCI Bounding Coordinates */
+const UCI_BOUNDARY = [
+    { lat: 33.649915, lng: -117.854738 }, // Campus Dr & Stanford
+    { lat: 33.652910, lng: -117.844074 }, // Campus Dr & Bridge
+    { lat: 33.654647, lng: -117.841040 }, // University Dr Curve
+    { lat: 33.650526, lng: -117.836266 }, // California Ave Entrance
+    { lat: 33.643189, lng: -117.844353 }, // East Peltason & Los Trancos
+    { lat: 33.644944, lng: -117.853280 }  // Michael Drake Drive Loop
+];
+
+/** Returns random coords inside UCI_BOUNDARY */
+function getRandomUciCoordinate() {
+    const polygon = new google.maps.Polygon({ paths: UCI_BOUNDARY });
+
+    const minLat = 33.641;
+    const maxLat = 33.656;
+    const minLng = -117.857;
+    const maxLng = -117.833;
+
+    for (let i = 0; i < 80; i++) {
+        const lat = minLat + Math.random() * (maxLat - minLat);
+        const lng = minLng + Math.random() * (maxLng - minLng);
+        const point = new google.maps.LatLng(lat, lng);
+
+        if (google.maps.geometry.poly.containsLocation(point, polygon)) {
+            return point;
+        }
+    }
+
+    console.warn("Polygon randomization failed, returning fallback.");
+    return new google.maps.LatLng(33.646, -117.841);
+}
+
 /**
  * asks if street view is available at given coords
  * @param {google.maps.LatLng} latLng 
@@ -43,34 +76,26 @@ function getValidStreetViewLocation(latLng) {
 }
 
 /**
- * returns a random lat/lng inside UCI bounding zone
- */
-function getRandomUciCoordinate() {
-    const lat = 33.640 + Math.random() * 0.020; // ~2km box
-    const lng = -117.855 + Math.random() * 0.030;
-    return new google.maps.LatLng(lat, lng);
-}
-
-/**
  * tries multiple times to find a random street view location
  */
 async function spawnRandomStreetView() {
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 25; i++) {
         const candidate = getRandomUciCoordinate();
         const validLocation = await getValidStreetViewLocation(candidate);
 
         if (validLocation) {
-            console.log("✅ Spawned at:", validLocation.toString());
+            console.log("Spawned at:", validLocation.toString());
             panorama.setPosition(validLocation);
+            document.getElementById("spawn-coords").textContent = `Spawned at: ${validLocation.lat().toFixed(6)}, ${validLocation.lng().toFixed(6)}`;
             return;
         }
     }
 
-    console.warn("⚠️ Could not find random Street View spot. Defaulting to center.");
+    console.warn("No street view inside bounds, using fallback.");
     panorama.setPosition({ lat: 33.646, lng: -117.841 });
 }
 
-
+//** Initializes the game map and street view */
 function initGameMap() {
 
     const uciCenter = { lat: 33.646, lng: -117.841 }; 
@@ -131,24 +156,40 @@ function initGameMap() {
 
     // Street View Panorama
     panorama = new google.maps.StreetViewPanorama(
-        document.getElementById("street-view"),
-        {
-            pov: { heading: 34, pitch: 10 },
-            visible: true,
-            enableCloseButton: false,
-            addressControl: false,
-            fullscreenControl: false,
-            motionTrackingControl: false,
-            linksControl: true,
-            panControl: false,
-        }
+    document.getElementById("street-view"),
+    {
+        pov: { heading: 0, pitch: 0 },   // camera facing direction locked
+        zoom: 1,
+
+        // Disable all controls
+        linksControl: false,        // removes arrows to move
+        panControl: false,          // removes panning UI
+        zoomControl: false,         // no zoom UI
+        enableCloseButton: false,
+        addressControl: false,
+        fullscreenControl: false,
+        motionTracking: false,
+        motionTrackingControl: false,
+        clickToGo: false,           // disables clicking to teleport
+        scrollwheel: false,
+        disableDefaultUI: true,
+        gestureHandling: 'none'   // disables all gestures
+    }
     );
+
+    // Lock Camera Orientation
+    let lockedHeading = 0;
+    let lockedPitch = 0;
+
+    panorama.addListener('pov_changed', () => {
+        panorama.setPov({ heading: lockedHeading, pitch: lockedPitch });
+    });
 
     // Connect the map with the panorama
     map.setStreetView(panorama);
 
     svService = new google.maps.StreetViewService();
 
-    // ✅ Spawn player at random valid Street View location
+    // Spawn player at random valid Street View location
     spawnRandomStreetView();
 }
