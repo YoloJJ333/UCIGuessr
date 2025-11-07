@@ -4,6 +4,7 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden; 
+    background-color: lightblue;
 }
 
 .hidden {
@@ -122,17 +123,41 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 65vh;
     text-align: center;
 }
-.center-content h1 {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
+.img-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: flex-start;
 }
-.center-content p {
-    font-size: 1.25rem;
-    color: #555;
-    margin-bottom: 2rem;
+.img-container img {
+    width: 16%;
+    height: auto;
+}
+.img-container #uci-map {
+    border-radius: 50%;
+}
+.center-content h1 {
+    font-size: 6rem;
+    color: darkblue;
+    position: relative;
+    background: none;
+}
+.center-content h1::after {
+    content: '';
+    position: absolute;
+    bottom: -0.2rem;
+    left: -50%;
+    width: 200%;
+    height: 7px;
+    background: linear-gradient(120deg, transparent, gold, transparent);
+}
+.center-content h2 {
+    font-size: 2rem;
+    margin-top: 2px;
+    margin-bottom: 15px;
 }
 
 #start-button {
@@ -150,4 +175,18 @@ html, body {
 }
 #start-button:hover {
     background-color: #004ecc;
+}
+
+#instructions {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px 30px;
+    border-radius: 20px;
+}
+#instructions h2, h3 {
+    text-align: center;
 }
