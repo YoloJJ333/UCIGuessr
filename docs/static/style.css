@@ -29,11 +29,18 @@ html, body {
     pointer-events: none;
 }
 
-#ui-elements h3{
+#ui-elements .timer {
     background-color: rgba(96, 18, 117, 0.9);
     color: white;
+    text-align: center;
     padding: 8px 16px;
     border-radius: 10px;
+}
+
+#ui-elements #coords-display, #score {
+    background-color: white;
+    text-align: center;
+    border-radius: 5px;
 }
 
 /* Make interactive controls inside the UI clickable while keeping the container click-through */

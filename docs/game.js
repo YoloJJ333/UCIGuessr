@@ -40,8 +40,6 @@ let timeLeft = 120; // 2 minutes
  */
 let timerInterval = null;
 
-
-
 //**UCI Bounding Coordinates */
 const UCI_BOUNDARY = [
     { lat: 33.649915, lng: -117.854738 }, // Campus Dr & Stanford
@@ -126,7 +124,7 @@ function calculateScore() {
     if (!marker || !spawnLocation) return 0;
 
     const clicked = marker.getPosition();
-    const distance = google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation) / 1000;
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation);
 
     const size = google.maps.geometry.spherical.computeDistanceBetween(
         new google.maps.LatLng(33.64141191981308, -117.84915619540708), new google.maps.LatLng(33.65480941557804, -117.83530280301413))
@@ -161,8 +159,7 @@ function startTimer() {
 }
 
 //** Initializes the game map and street view */
-function initGameMap() {
-
+async function initGameMap() {
     const uciCenter = { lat: 33.646, lng: -117.841 }; 
     
     const noLandmarksStyle = [
@@ -238,11 +235,6 @@ function initGameMap() {
     }
     );
 
-    // Lock Camera Orientation
-    panorama.addListener('pov_changed', () => {
-        panorama.setPov({ heading: heading, pitch: 0 });
-    });
-
     // Connect the map with the panorama
     map.setStreetView(panorama);
 
@@ -268,7 +260,7 @@ function endRound() {
     const score = calculateScore();
 
     // disable further interactions on map
-    map.setOptions({ draggable: false, zoomControl: false, scrollwheel: false, gestureHandling: 'none' });
+    map.setOptions({ draggable: true, zoomControl: true, scrollwheel: true, gestureHandling: 'none' });
 
     // disable submit to prevent multiple calculations
     if (submitBtn) {
@@ -280,7 +272,8 @@ function endRound() {
     if (marker && spawnLocation) {
         const clicked = marker.getPosition();
         const distanceMeters = Math.round(google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation));
-        document.getElementById("coords-display").textContent = `Distance: ${distanceMeters} m`;
+        document.getElementById("coords-display").textContent = `Distance: ${distanceMeters}m`;
+        document.getElementById("score").textContent = `Score: ${score}`;
     }
 
     alert(`Your Score: ${score}\nThank you for playing!`);
