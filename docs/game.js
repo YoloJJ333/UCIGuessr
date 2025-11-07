@@ -216,34 +216,31 @@ function initGameMap() {
     });
 
     // Street View Panorama
+    const heading = Math.random() * 360
     panorama = new google.maps.StreetViewPanorama(
     document.getElementById("street-view"),
     {
-        pov: { heading: Math.random() * 360, pitch: 0 }, // random camera rotation between 0-360 degrees
+        pov: { heading: heading, pitch: 0 }, // random camera rotation between 0-360 degrees
         zoom: 1,
 
         linksControl: false,        // removes arrows to move
         panControl: false,          // removes panning UI
-        zoomControl: true,         
         enableCloseButton: false,
         addressControl: false,
-        fullscreenControl: true,
+        fullscreenControl: false,
         motionTracking: false,
         motionTrackingControl: false,
         clickToGo: false,           // disables clicking to teleport
-        scrollwheel: false,
         disableDefaultUI: true,
-        gestureHandling: 'none',   // disables all gestures
         showRoadLabels: false,
+        scrollwheel: true,
+        zoomControl: true,
     }
     );
 
     // Lock Camera Orientation
-    let lockedHeading = 0;
-    let lockedPitch = 0;
-
     panorama.addListener('pov_changed', () => {
-        panorama.setPov({ heading: lockedHeading, pitch: lockedPitch });
+        panorama.setPov({ heading: heading, pitch: 0 });
     });
 
     // Connect the map with the panorama
