@@ -23,7 +23,18 @@ html, body {
     top: 10px;
     left: 10px;
     z-index: 2000;
-    pointer-events: none; /* allows clicks to pass through */
+    /* allow clicks to pass through the overlay container so Street View underneath can be clicked,
+       but enable pointer-events on actual interactive children (buttons/inputs) below */
+    pointer-events: none;
+}
+
+/* Make interactive controls inside the UI clickable while keeping the container click-through */
+#ui-elements button,
+#ui-elements a,
+#ui-elements input,
+#ui-elements select,
+#ui-elements textarea {
+    pointer-events: auto;
 }
 
 /* UI Elements Styling */

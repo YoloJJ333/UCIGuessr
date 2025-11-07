@@ -22,6 +22,26 @@ let panorama;
  */
 let svService;
 
+/**
+ * correct spawn location
+ * @type {google.maps.LatLng|null}
+ */
+let spawnLocation = null;
+
+/**
+ * remaining time in seconds
+ * @type {number}
+ */
+let timeLeft = 120; // 2 minutes
+
+/**
+ * timer interval reference
+ * @type {number|null}
+ */
+let timerInterval = null;
+
+
+
 //**UCI Bounding Coordinates */
 const UCI_BOUNDARY = [
     { lat: 33.649915, lng: -117.854738 }, // Campus Dr & Stanford
@@ -84,15 +104,62 @@ async function spawnRandomStreetView() {
         const validLocation = await getValidStreetViewLocation(candidate);
 
         if (validLocation) {
+            spawnLocation = validLocation;
+
             console.log("Spawned at:", validLocation.toString());
             panorama.setPosition(validLocation);
-            document.getElementById("spawn-coords").textContent = `Spawned at: ${validLocation.lat().toFixed(6)}, ${validLocation.lng().toFixed(6)}`;
+            document.getElementById("spawn-coords").textContent =
+                `Spawned at: ${validLocation.lat().toFixed(6)}, ${validLocation.lng().toFixed(6)}`;
+
+            startTimer();
             return;
         }
     }
 
     console.warn("No street view inside bounds, using fallback.");
-    panorama.setPosition({ lat: 33.646, lng: -117.841 });
+
+    const fallback = new google.maps.LatLng(33.646, -117.841);
+    panorama.setPosition(fallback);
+
+    // ✅ Also record fallback so scoring doesn't break
+    spawnLocation = fallback;
+}
+
+function calculateScore() {
+    if (!marker || !spawnLocation) return 0;
+
+    const clicked = marker.getPosition();
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation) / 1000;
+
+    const size = 0.019271984162642; // approx UCI size in km
+    const score = 5000 * Math.exp(-10 * (distance / size));
+    return Math.round(score);
+}
+
+function startTimer() {
+    // prevent multiple intervals
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+    }
+
+    // set initial display
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = (timeLeft % 60).toString().padStart(2, "0");
+    document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = (timeLeft % 60).toString().padStart(2, "0");
+        document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+
+        if (timeLeft <= 0) {
+            // ensure timer is cleared once
+            clearInterval(timerInterval);
+            timerInterval = null;
+            endRound(); // auto-lock last guess
+        }
+    }, 1000);
 }
 
 //** Initializes the game map and street view */
@@ -191,4 +258,39 @@ function initGameMap() {
 
     // Spawn player at random valid Street View location
     spawnRandomStreetView();
+
+    document.getElementById("submit-guess").addEventListener("click", endRound);
+}
+
+function endRound() {
+    // If we've already ended the round, do nothing
+    const submitBtn = document.getElementById("submit-guess");
+    if (submitBtn && submitBtn.disabled) return;
+
+    // stop timer if running
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    const score = calculateScore();
+    document.getElementById("score-display").textContent = score.toString();
+
+    // disable further interactions on map
+    map.setOptions({ draggable: false, zoomControl: false, scrollwheel: false, gestureHandling: 'none' });
+
+    // disable submit to prevent multiple calculations
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Guess Submitted";
+    }
+
+    // optionally show distance on UI if available
+    if (marker && spawnLocation) {
+        const clicked = marker.getPosition();
+        const distanceMeters = Math.round(google.maps.geometry.spherical.computeDistanceBetween(clicked, spawnLocation));
+        document.getElementById("coords-display").textContent = `Distance: ${distanceMeters} m`;
+    }
+
+    alert(`Your Score: ${score}\nThank you for playing!`);
 }
