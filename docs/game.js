@@ -121,7 +121,7 @@ async function spawnRandomStreetView() {
     const fallback = new google.maps.LatLng(33.646, -117.841);
     panorama.setPosition(fallback);
 
-    // ✅ Also record fallback so scoring doesn't break
+
     spawnLocation = fallback;
 }
 
@@ -226,7 +226,7 @@ function initGameMap() {
     panorama = new google.maps.StreetViewPanorama(
     document.getElementById("street-view"),
     {
-        pov: { heading: 0, pitch: 0 },   // camera facing direction locked
+        pov: { heading: Math.random() * 360, pitch: 0 }, // random camera rotation between 0-360 degrees
         zoom: 1,
 
         linksControl: false,        // removes arrows to move
