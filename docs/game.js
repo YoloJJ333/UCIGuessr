@@ -161,13 +161,12 @@ function initGameMap() {
         pov: { heading: 0, pitch: 0 },   // camera facing direction locked
         zoom: 1,
 
-        // Disable all controls
         linksControl: false,        // removes arrows to move
         panControl: false,          // removes panning UI
-        zoomControl: false,         // no zoom UI
+        zoomControl: true,         
         enableCloseButton: false,
         addressControl: false,
-        fullscreenControl: false,
+        fullscreenControl: true,
         motionTracking: false,
         motionTrackingControl: false,
         clickToGo: false,           // disables clicking to teleport
