@@ -128,7 +128,7 @@ function calculateScore() {
 
     const size = google.maps.geometry.spherical.computeDistanceBetween(
         new google.maps.LatLng(33.64141191981308, -117.84915619540708), new google.maps.LatLng(33.65480941557804, -117.83530280301413))
-    const score = 5000 * Math.exp(-10 * (distance / size));
+    const score = 5000 * Math.exp(-9 * (distance / size));
     return Math.round(score);
 }
 
@@ -158,8 +158,30 @@ function startTimer() {
     }, 1000);
 }
 
+async function getImage() {
+    const ANON_API = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJreHNoanlyZ2hudGJ4ZGlibHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NzAzMzMsImV4cCI6MjA3ODA0NjMzM30.7Yf0Sy4UnP29urG6GR1K6jO-YzaNQtixadrJIqqfwD8"
+    const url = "https://rkxshjyrghntbxdibltz.supabase.co/rest/v1/rpc/get_random_row"
+    const response = await fetch(url, {
+        headers: {
+            "apikey": ANON_API,
+            "Authorization": `Bearer ${ANON_API}`
+        }});
+    return await response.json()
+}
+
 //** Initializes the game map and street view */
 async function initGameMap() {
+    let databaseImage = await getImage();
+    
+    let image_fail = false;
+    if (!databaseImage || databaseImage.length == 0) {
+        console.error("Failed to load image from database");
+        image_fail = true;
+    } else {
+        databaseImage = databaseImage[0]
+        spawnLocation = new google.maps.LatLng(databaseImage.lat, databaseImage.lng)
+    }
+
     const uciCenter = { lat: 33.646, lng: -117.841 }; 
     
     const noLandmarksStyle = [
@@ -241,7 +263,14 @@ async function initGameMap() {
     svService = new google.maps.StreetViewService();
 
     // Spawn player at random valid Street View location
-    spawnRandomStreetView();
+    if(Math.random() < 0.5 || image_fail) {
+        document.getElementById('image-view').classList.add('hidden')
+        spawnRandomStreetView();
+    } else {
+        document.getElementById('street-view').classList.add('hidden')
+        document.getElementById('image-view').src = databaseImage.url
+        console.log(spawnLocation)
+    }
 
     document.getElementById("submit-guess").addEventListener("click", endRound);
 }
@@ -259,7 +288,7 @@ function endRound() {
 
     const score = calculateScore();
 
-    // disable further interactions on map
+    // allow movement on map (current not working due to unable to prevent rotation)
     map.setOptions({ draggable: true, zoomControl: true, scrollwheel: true, gestureHandling: 'none' });
 
     // disable submit to prevent multiple calculations
