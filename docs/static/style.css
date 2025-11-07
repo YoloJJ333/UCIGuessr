@@ -11,10 +11,9 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: 0;
-    pointer-events: none !important;
 }
 
 /* UI Overlay Container*/
@@ -35,32 +34,61 @@ html, body {
     font-family:'Courier New', Courier, monospace;
     margin-left: 10px;
 }
+
 /* Mini Map */
 #map {
-    position: fixed !important;
-    bottom: 10px !important;
-    right: 10px !important;
-    left: auto !important;
-    top: auto !important;
-    z-index: 100000 !important;
-    pointer-events: auto; /* allows interaction */
+    position: absolute; 
+    bottom: 2px;
+    right: 2px;
+    z-index: 1000;
 
-    width: 300px !important;
-    height: 200px !important;
+    width: 25%;
+    height: 30%;
     
-    border: 2px solid red;
-    border-radius: 6px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-    
-    transition: all 0.3s ease-in-out;
-    background-color: #e0e0e0; 
-    
-    transition: width 0.15s, height 0.15s;
-    overflow: hidden; 
+    border-radius: 4px;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+    background-color: #e0e0e0; /* shouldn't be visible */
+    transition: all 0.15s;
+    overflow: hidden; /* keeps map inside the corners */
 }
 
 #map:hover {
-    width: 500px !important;
-    height: 400px !important;
+    width: 50%;
+    height: 60%;
 }
 
+/* index.html */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+.center-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+.center-content p {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+#start-button {
+    display: flex;
+    gap: 1rem;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    background-color: #0062ff;
+    color: white;
+}
+#start-button:hover {
+    background-color: #004ecc;
+}
